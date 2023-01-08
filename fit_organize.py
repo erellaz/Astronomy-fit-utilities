@@ -11,7 +11,7 @@ pathinput =r"D:\Moana\Stage\Light\\"
 pathoutput =r"D:\Moana\Data\\"
 pathtoscan =r"D:\Moana\Data\\"
 trashpath=r"D:\Moana\Data\Trash\\"
-namepattern="_60"
+namepattern="_80"
 
 #___________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________
@@ -24,21 +24,23 @@ def removebadframes(pathinput,trashpath):
         csvreader = csv.reader(csvfile, delimiter=',', quotechar='|')
         for row in csvreader:
             if row[0].isnumeric():
-                approval=row[1]
+                approval=str(row[1])
                 fitfile=str(row[3])
                 fitfile=fitfile.replace("\"","")
                 fwhm=float(row[13])
                 eccentricity=float(row[14])
+                stars=float(row[21])
                 #print(', '.join(row))
                 print("Considering file: ",fitfile, approval,fwhm,eccentricity)
-                if approval=="false" or eccentricity>0.65 or fwhm>4:
-                    (root,file)=os.path.split(fitfile)
-                    badname=os.path.join(trashpath,file)
-                    print ("This file needs to be moved ",fitfile," to ",badname,"---", approval,fwhm,eccentricity)
+                if eccentricity>0.7: # or approval=="false" or fwhm>2.5: # or stars<625:
+                    (root,file)=os.path.split(fitfile.strip('\"'))
+                    badfile=os.path.join(trashpath,file)
+                    original=os.path.join(pathinput,file)
+                    print ("This file needs to be moved ",original," to ",badfile,"---", approval,fwhm,eccentricity,stars)
                     try:
-                        shutil.move(fitfile,badname)
+                        shutil.move(original,badfile)
                     except:
-                        print(fitfile," not found!")
+                        print(original," not found!")
 #_______________________________________________________________________________________________________________________
 # Rename fit files to avoid name collisions
 def renamesgp(pathinput,namepattern):
